@@ -1,0 +1,12 @@
+# Most of this profile taken from: http://linuxgazette.net/147/appaiah.html
+
+# Prefer an audible bell to the visual one.
+vbell off
+
+# Skip the startup message
+startup_message off
+
+# Display a caption string below, appearing like tabs and
+# displaying the window number and application name (by default).
+caption always
+caption string "%{kw}%-w%{wr}%n %t%{-}%+w"
