@@ -3,6 +3,7 @@ export EDITOR="vim"
 export GREP_OPTIONS='--color=auto'
 
 [[ -s /usr/local/rvm/scripts/rvm ]] && source /usr/local/rvm/scripts/rvm
+[[ -s ~/.rails_env ]] && source ~/.rails_env
 
 if command -v ack-grep >/dev/null; then
   alias ack='ack-grep'
