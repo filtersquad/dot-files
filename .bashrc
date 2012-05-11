@@ -5,6 +5,12 @@ export GREP_OPTIONS='--color=auto'
 [[ -s /usr/local/rvm/scripts/rvm ]] && source /usr/local/rvm/scripts/rvm
 [[ -s ~/.rails_env ]] && source ~/.rails_env
 
+
+bundler_env_bin_path="$HOME/$RAILS_ENV/shared/bundle/ruby/1.9.1/bin"
+if [[ -n "$RAILS_ENV" && -d "$bundler_env_bin_path" ]]; then
+  export PATH="$bundler_env_bin_path:$PATH"
+fi
+
 if command -v ack-grep >/dev/null; then
   alias ack='ack-grep'
 fi
