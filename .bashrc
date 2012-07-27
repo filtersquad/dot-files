@@ -48,7 +48,6 @@ ss() {
   else
     r server "$@"
   fi
-  
 }
 
 alias sc="r console"
@@ -62,6 +61,8 @@ alias wl='mkdir -p tmp && tail -n0 -f log/*.log'
 alias rwl='rr && wl'
 alias rd='rr && touch tmp/debug.txt'
 alias rdl='rd && wl'
+
+alias be='bundle exec'
 
 # General shell options
 HISTCONTROL=ignoredups:ignorespace
