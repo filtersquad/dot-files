@@ -23,16 +23,6 @@ rescue LoadError => e
   end
 end
 
-Numeric.class_eval do
-
-  def of(&blk)
-    (1..self.to_i).map do
-      yield
-    end
-  end
-
-end
-
 def diff(a, b, file = "current.diff")
   require 'rspec/expectations/differ'
   differ = RSpec::Expectations::Differ.new
@@ -41,7 +31,6 @@ def diff(a, b, file = "current.diff")
   system "mate", file
 end
 
-# Require PrettyPrint cuz it pwns...how did I not know about this?
 require 'pp'
 
 # Benchmarking
@@ -69,7 +58,11 @@ if ENV['RAILS_ENV'] || defined?(Rails)
 
   require 'logger'
   if defined?(Rails) && Rails.respond_to?(:logger=)
-    Rails.logger = Logger.new(STDOUT)
+    new_logger = Logger.new(STDOUT)
+    if defined?(ActiveSupport::TaggedLogging)
+      new_logger = ActiveSupport::TaggedLogging.new(new_logger)
+    end
+    Rails.logger = new_logger
     defined?(ActiveRecord) && ActiveRecord::Base.logger = Rails.logger
     defined?(Mongoid)      && Mongoid.logger = Rails.logger
     if defined?(MongoMapper)
@@ -91,24 +84,4 @@ if ENV['RAILS_ENV'] || defined?(Rails)
     ActiveRecord::Base.logger = logger
     ActiveRecord::Base.clear_active_connections!
   end
-else
-  UtilityBelt::Equipper.equip(:symbol_to_proc) if defined?(UtilityBelt::Equipper)
-end
-
-proc do
-  path = File.join(Dir.pwd, ".irb")
-  load(path) if File.file?(path)
-end.call
-
-if defined?(Rails)
-
-  def rr
-    if Rails::VERSION::STRING >= "3.0.0"
-      puts "Reloading..."
-      ActionDispatch::Callbacks.new(lambda {}, false).call({})
-    else
-      reload!
-    end
-  end
-
 end
