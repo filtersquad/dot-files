@@ -23,33 +23,6 @@ rescue LoadError => e
   end
 end
 
-def diff(a, b, file = "current.diff")
-  require 'rspec/expectations/differ'
-  differ = RSpec::Expectations::Differ.new
-  diff = differ.diff_as_object(a, b)
-  File.open(file, "w+") { |f| f.write diff }
-  system "mate", file
-end
-
-require 'pp'
-
-# Benchmarking
-require 'benchmark'
-def bench(n=1e3,&b)
-  Benchmark.bmbm do |r|
-    r.report {n.to_i.times(&b)}
-  end
-end
-
-class Object
-  def local_methods(obj = self)
-    (obj.methods - obj.class.superclass.instance_methods).sort
-  end
-end
-
-# Use the simple prompt if possible.
-IRB.conf[:PROMPT_MODE] = :SIMPLE if IRB.conf[:PROMPT_MODE] == :DEFAULT
-
 if ENV['RAILS_ENV'] || defined?(Rails)
 
   def sql(query)
@@ -58,16 +31,10 @@ if ENV['RAILS_ENV'] || defined?(Rails)
 
   require 'logger'
   if defined?(Rails) && Rails.respond_to?(:logger=)
-    new_logger = Logger.new(STDOUT)
-    if defined?(ActiveSupport::TaggedLogging)
-      new_logger = ActiveSupport::TaggedLogging.new(new_logger)
-    end
-    Rails.logger = new_logger
+    tagged_logger = defined?(ActiveSupport::TaggedLogging) && Rails.logger.is_a?(ActiveSupport::TaggedLogging)
+    Rails.logger = Logger.new(STDOUT)
+    Rails.logger = ActiveSupport::TaggedLogging.new(Rails.logger) if tagged_logger
     defined?(ActiveRecord) && ActiveRecord::Base.logger = Rails.logger
-    defined?(Mongoid)      && Mongoid.logger = Rails.logger
-    if defined?(MongoMapper)
-      MongoMapper.connection.instance_variable_set :@logger, Rails.logger
-    end
   else
     Object.const_set(:RAILS_DEFAULT_LOGGER, Logger.new(STDOUT))
   end
@@ -84,4 +51,5 @@ if ENV['RAILS_ENV'] || defined?(Rails)
     ActiveRecord::Base.logger = logger
     ActiveRecord::Base.clear_active_connections!
   end
+
 end
